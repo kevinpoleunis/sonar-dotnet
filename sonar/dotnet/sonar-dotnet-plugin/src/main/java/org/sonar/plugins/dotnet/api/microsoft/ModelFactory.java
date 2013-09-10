@@ -347,13 +347,16 @@ public final class ModelFactory {
       XPathExpression projectTypeExpression = xpath.compile("/vst:Project/vst:PropertyGroup/vst:OutputType");
       XPathExpression assemblyNameExpression = xpath.compile("/vst:Project/vst:PropertyGroup/vst:AssemblyName");
       XPathExpression rootNamespaceExpression = xpath.compile("/vst:Project/vst:PropertyGroup/vst:RootNamespace");
-
       XPathExpression silverlightExpression = xpath.compile("/vst:Project/vst:PropertyGroup/vst:SilverlightApplication");
+      XPathExpression silverlightVersionExpression = xpath.compile("/vst:Project/vst:PropertyGroup/vst:SilverlightVersion");
+      XPathExpression targetFrameworkExpression = xpath.compile("/vst:Project/vst:PropertyGroup[not(@Condition)]/vst:TargetFrameworkVersion");
       XPathExpression projectGuidExpression = xpath.compile("/vst:Project/vst:PropertyGroup/vst:ProjectGuid");
 
       // Extracts the properties of a Visual Studio Project
       String typeStr = extractProjectProperty(projectTypeExpression, projectFile);
       String silverlightStr = extractProjectProperty(silverlightExpression, projectFile);
+      String silverlightVersionStr = getSilverlightVersion(projectFile, silverlightVersionExpression, targetFrameworkExpression);
+      
       String assemblyName = extractProjectProperty(assemblyNameExpression, projectFile);
       String rootNamespace = extractProjectProperty(rootNamespaceExpression, projectFile);
       String projectGuid = extractProjectProperty(projectGuidExpression, projectFile);
@@ -382,6 +385,7 @@ public final class ModelFactory {
 
       if (StringUtils.isNotEmpty(silverlightStr)) {
         project.setSilverlightProject(true);
+        project.setSilverlightVersion(silverlightVersionStr);
       }
 
       // Get all source files to find the assembly version
@@ -396,6 +400,16 @@ public final class ModelFactory {
       throw new DotNetException("Error while processing the project " + projectFile, xpee);
     }
   }
+
+private static String getSilverlightVersion(File projectFile,
+		XPathExpression silverlightVersionExpression,
+		XPathExpression targetFrameworkExpression) throws DotNetException {
+	String silverlightVersionStr = extractProjectProperty(silverlightVersionExpression, projectFile);
+      if(StringUtils.equals(silverlightVersionStr, "$(TargetFrameworkVersion)")) {
+    	  silverlightVersionStr = extractProjectProperty(targetFrameworkExpression, projectFile);
+      }
+	return silverlightVersionStr;
+}
 
   protected static String findAssemblyVersion(Collection<SourceFile> sourceFiles) {
     String version = null;

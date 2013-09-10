@@ -19,6 +19,7 @@
  */
 package org.sonar.dotnet.tools.fxcop;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.utils.command.Command;
@@ -38,6 +39,7 @@ public class FxCopCommandBuilder extends CilRuleEngineCommandBuilderSupport { //
   private static final Logger LOG = LoggerFactory.getLogger(FxCopCommandBuilder.class);
   private static final int DEFAULT_TIMEOUT = 10;
   private static final int MINUTES_TO_SECONDS = 60;
+  private static final String SILVERLIGHT_DLL = "mscorlib.dll";
 
   private File silverlightFolder;
   private String[] assemblyDependencyDirectories = new String[] {};
@@ -143,6 +145,10 @@ public class FxCopCommandBuilder extends CilRuleEngineCommandBuilderSupport { //
       }
       LOG.debug("   o [Silverlight] " + silverlightFolder.getAbsolutePath());
       command.addArgument("/d:" + silverlightFolder.getAbsolutePath());
+      if(isSilverLight5()) {
+    	  LOG.debug("   o [Silverlight] : " + vsProject.getSilverlightVersion());
+    	  command.addArgument("/platform:" + silverlightFolder.getAbsolutePath() + File.separator + SILVERLIGHT_DLL);
+      }
     }
 
     if (ignoreGeneratedCode) {
@@ -173,6 +179,10 @@ public class FxCopCommandBuilder extends CilRuleEngineCommandBuilderSupport { //
 
   private boolean isSilverlightUsed() {
     return vsProject.isSilverlightProject();
+  }
+  
+  private boolean isSilverLight5(){
+	  return StringUtils.equalsIgnoreCase("v5.0", vsProject.getSilverlightVersion());
   }
 
 }

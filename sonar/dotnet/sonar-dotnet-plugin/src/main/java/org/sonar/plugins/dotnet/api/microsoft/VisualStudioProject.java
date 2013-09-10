@@ -60,6 +60,7 @@ public class VisualStudioProject {
   private Map<BuildConfiguration, File> buildConfOutputDirMap;
   private File directory;
   private boolean silverlightProject;
+  private String silverlightVersion;
   private Map<File, SourceFile> sourceFileMap;
 
   private boolean unitTest;
@@ -495,6 +496,15 @@ public class VisualStudioProject {
   public boolean isSilverlightProject() {
     return silverlightProject;
   }
+  
+  public String getSilverlightVersion() {
+	return silverlightVersion;
+  }
+
+  public void setSilverlightVersion(String silverlightVersion) {
+	this.silverlightVersion = silverlightVersion;
+  }
+
 
   void setBuildConfOutputDirMap(Map<BuildConfiguration, File> buildConfOutputDirMap) {
     this.buildConfOutputDirMap = buildConfOutputDirMap;
